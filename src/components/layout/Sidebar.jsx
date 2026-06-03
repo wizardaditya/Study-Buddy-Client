@@ -1,24 +1,34 @@
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Rss, HelpCircle, FolderKanban, Users, Video, ClipboardList, Trophy, Briefcase, Bot, Flame, Crown } from "lucide-react";
+import { LayoutDashboard, Rss, HelpCircle, FolderKanban, Users, Video, ClipboardList, Trophy, Briefcase, Bot, Flame, Crown, UserCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ROUTES } from "@/constants";
 import { useAuthStore } from "@/store/auth.store";
-
-const navItems = [
-  { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.DASHBOARD },
-  { label: "Feed", icon: Rss, to: ROUTES.FEED },
-  { label: "Doubts", icon: HelpCircle, to: ROUTES.DOUBTS },
-  { label: "Projects", icon: FolderKanban, to: ROUTES.PROJECTS },
-  { label: "Mentors", icon: Users, to: ROUTES.MENTORS },
-  { label: "Study Rooms", icon: Video, to: ROUTES.STUDY_ROOMS },
-  { label: "Mock Tests", icon: ClipboardList, to: ROUTES.MOCK_TESTS },
-  { label: "Leaderboard", icon: Trophy, to: ROUTES.LEADERBOARD },
-  { label: "Hiring", icon: Briefcase, to: ROUTES.HIRING },
-  { label: "Aura AI", icon: Bot, to: ROUTES.AURA, highlight: true },
-];
+import { useQuery } from "@tanstack/react-query";
+import { connectionService } from "@/services/connection.service";
 
 export default function Sidebar() {
   const { user } = useAuthStore();
+
+  const { data: pendingRequests = [] } = useQuery({
+    queryKey: ["connections-pending"],
+    queryFn: connectionService.getPendingRequests,
+    enabled: !!user,
+    refetchInterval: 30000, // poll every 30s
+  });
+
+  const navItems = [
+    { label: "Dashboard", icon: LayoutDashboard, to: ROUTES.DASHBOARD },
+    { label: "Feed", icon: Rss, to: ROUTES.FEED },
+    { label: "Doubts", icon: HelpCircle, to: ROUTES.DOUBTS },
+    { label: "Projects", icon: FolderKanban, to: ROUTES.PROJECTS },
+    { label: "Connections", icon: UserCheck, to: ROUTES.CONNECTIONS, badge: pendingRequests.length || null },
+    { label: "Mentors", icon: Users, to: ROUTES.MENTORS },
+    { label: "Study Rooms", icon: Video, to: ROUTES.STUDY_ROOMS },
+    { label: "Mock Tests", icon: ClipboardList, to: ROUTES.MOCK_TESTS },
+    { label: "Leaderboard", icon: Trophy, to: ROUTES.LEADERBOARD },
+    { label: "Hiring", icon: Briefcase, to: ROUTES.HIRING },
+    { label: "Aura AI", icon: Bot, to: ROUTES.AURA, highlight: true },
+  ];
 
   return (
     <aside className="hidden md:flex flex-col w-60 border-r border-border bg-card min-h-screen px-3 py-4 fixed top-16 left-0 bottom-0 overflow-y-auto">
@@ -37,7 +47,7 @@ export default function Sidebar() {
       )}
 
       <nav className="flex-1 space-y-1">
-        {navItems.map(({ label, icon: Icon, to, highlight }) => (
+        {navItems.map(({ label, icon: Icon, to, highlight, badge }) => (
           <NavLink
             key={to}
             to={to}
@@ -54,6 +64,9 @@ export default function Sidebar() {
             {label}
             {highlight && (
               <span className="ml-auto text-[10px] bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded-full">AI</span>
+            )}
+            {badge > 0 && (
+              <span className="ml-auto text-[10px] bg-primary text-primary-foreground px-1.5 py-0.5 rounded-full font-bold">{badge}</span>
             )}
           </NavLink>
         ))}

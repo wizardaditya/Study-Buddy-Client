@@ -34,6 +34,7 @@ import Leaderboard from "@/pages/Leaderboard";
 import Hiring from "@/pages/Hiring";
 import Aura from "@/pages/Aura";
 import Profile from "@/pages/Profile";
+import Connections from "@/pages/Connections";
 import Settings from "@/pages/Settings";
 
 // Admin Pages
@@ -104,6 +105,7 @@ function AppInner() {
           <Route path="/hiring" element={<Hiring />} />
           <Route path="/aura" element={<Aura />} />
           <Route path="/profile/:username" element={<Profile />} />
+          <Route path="/connections" element={<Connections />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
 

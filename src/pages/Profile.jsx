@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Github, Linkedin, MapPin, GraduationCap, Zap, Flame, Trophy, Pencil, Loader2, X } from "lucide-react";
+import { Github, Linkedin, MapPin, GraduationCap, Zap, Flame, Trophy, Pencil, Loader2, X, UserCheck, UserPlus, Clock } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { userService } from "@/services/user.service";
+import { connectionService } from "@/services/connection.service";
 import { useAuthStore } from "@/store/auth.store";
 import { getInitials } from "@/lib/utils";
 
@@ -121,6 +122,15 @@ export default function Profile() {
     enabled: !!username,
   });
 
+  const isOwnProfile = me?._id === profile?._id || me?.username === profile?.username;
+
+  // Connection status
+  const { data: connStatus, refetch: refetchConn } = useQuery({
+    queryKey: ["connection-status", profile?._id],
+    queryFn: () => connectionService.getStatus(profile._id),
+    enabled: !!profile?._id && !isOwnProfile,
+  });
+
   const followMutation = useMutation({
     mutationFn: () =>
       profile.isFollowing
@@ -128,6 +138,20 @@ export default function Profile() {
         : userService.follow(profile._id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["profile", username] });
+    },
+  });
+
+  const connectMutation = useMutation({
+    mutationFn: () => {
+      if (!connStatus) return connectionService.sendRequest(profile._id);
+      if (connStatus.status === "accepted") return connectionService.removeConnection(connStatus.connectionId);
+      if (connStatus.status === "pending" && connStatus.isSentByMe) return connectionService.removeConnection(connStatus.connectionId);
+      if (connStatus.status === "pending" && !connStatus.isSentByMe) return connectionService.acceptRequest(connStatus.connectionId);
+      return connectionService.sendRequest(profile._id);
+    },
+    onSuccess: () => {
+      refetchConn();
+      queryClient.invalidateQueries({ queryKey: ["connections"] });
     },
   });
 
@@ -146,8 +170,6 @@ export default function Profile() {
   }
 
   if (!profile) return <div className="text-center py-20 text-muted-foreground">User not found.</div>;
-
-  const isOwnProfile = me?._id === profile._id || me?.username === profile.username;
 
   const handleProfileSaved = (updated) => {
     updateUser(updated);
@@ -219,21 +241,44 @@ export default function Profile() {
           </div>
 
           {/* Action buttons */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {isOwnProfile ? (
               <Button variant="outline" size="sm" onClick={() => setShowEdit(true)}>
                 <Pencil className="h-3.5 w-3.5 mr-1.5" /> Edit Profile
               </Button>
             ) : (
-              <Button
-                variant={profile.isFollowing ? "outline" : "gradient"}
-                size="sm"
-                onClick={() => followMutation.mutate()}
-                disabled={followMutation.isPending}
-              >
-                {followMutation.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
-                {profile.isFollowing ? "Unfollow" : "Follow"}
-              </Button>
+              <>
+                {/* Follow button */}
+                <Button
+                  variant={profile.isFollowing ? "outline" : "secondary"}
+                  size="sm"
+                  onClick={() => followMutation.mutate()}
+                  disabled={followMutation.isPending}
+                >
+                  {followMutation.isPending && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
+                  {profile.isFollowing ? "Unfollow" : "Follow"}
+                </Button>
+
+                {/* Connect button */}
+                <Button
+                  variant={connStatus?.status === "accepted" ? "outline" : "gradient"}
+                  size="sm"
+                  onClick={() => connectMutation.mutate()}
+                  disabled={connectMutation.isPending}
+                >
+                  {connectMutation.isPending ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : connStatus?.status === "accepted" ? (
+                    <><UserCheck className="h-3.5 w-3.5 mr-1.5" />Connected</>
+                  ) : connStatus?.status === "pending" && connStatus?.isSentByMe ? (
+                    <><Clock className="h-3.5 w-3.5 mr-1.5" />Pending</>
+                  ) : connStatus?.status === "pending" && !connStatus?.isSentByMe ? (
+                    <><UserCheck className="h-3.5 w-3.5 mr-1.5" />Accept</>
+                  ) : (
+                    <><UserPlus className="h-3.5 w-3.5 mr-1.5" />Connect</>
+                  )}
+                </Button>
+              </>
             )}
           </div>
         </div>

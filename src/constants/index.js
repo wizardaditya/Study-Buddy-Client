@@ -23,6 +23,7 @@ export const ROUTES = {
   HIRING: "/hiring",
   AURA: "/aura",
   PROFILE: (username) => `/profile/${username}`,
+  CONNECTIONS: "/connections",
   SETTINGS: "/settings",
   ADMIN: "/admin",
   ADMIN_USERS: "/admin/users",
