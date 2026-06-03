@@ -19,14 +19,29 @@ export default function DoubtsNew() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (!form.topic) { setError("Please select a topic"); return; }
+
+    // Frontend validation — match backend requirements
+    if (form.title.trim().length < 10) {
+      setError("Title must be at least 10 characters");
+      return;
+    }
+    if (form.content.trim().length < 20) {
+      setError("Please describe your doubt in detail (at least 20 characters)");
+      return;
+    }
+    if (!form.topic) {
+      setError("Please select a topic");
+      return;
+    }
+
     setLoading(true);
     try {
       const tags = form.tags.split(",").map((t) => t.trim()).filter(Boolean);
       const doubt = await doubtService.createDoubt({ ...form, tags });
       navigate(ROUTES.DOUBTS_DETAIL(doubt._id));
-    } catch {
-      setError("Failed to post doubt. Try again.");
+    } catch (err) {
+      const msg = err?.response?.data?.message || err?.response?.data?.errors?.[0]?.message;
+      setError(msg || "Failed to post doubt. Try again.");
     } finally {
       setLoading(false);
     }
@@ -49,13 +64,22 @@ export default function DoubtsNew() {
           <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3">{error}</div>
         )}
         <div>
-          <label className="block text-sm font-medium mb-1.5">Title *</label>
+          <label className="block text-sm font-medium mb-1.5">Title * <span className="text-muted-foreground font-normal">(min 10 chars)</span></label>
           <Input name="title" placeholder="e.g. How to configure PWM on ESP32 for servo control?" value={form.title} onChange={handleChange} required maxLength={200} />
           <p className="text-xs text-muted-foreground mt-1">{form.title.length}/200</p>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">Explain your doubt *</label>
-          <textarea name="content" placeholder="Describe what you tried, what you expected, and what happened..." value={form.content} onChange={handleChange} required rows={8} className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none" />
+          <label className="block text-sm font-medium mb-1.5">Explain your doubt * <span className="text-muted-foreground font-normal">(min 20 chars)</span></label>
+          <textarea
+            name="content"
+            placeholder="Describe what you tried, what you expected, and what happened..."
+            value={form.content}
+            onChange={handleChange}
+            required
+            rows={8}
+            className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none"
+          />
+          <p className="text-xs text-muted-foreground mt-1">{form.content.length} chars</p>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1.5">Topic *</label>
@@ -73,8 +97,8 @@ export default function DoubtsNew() {
           </select>
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1.5">Tags</label>
-          <Input name="tags" placeholder="arduino, servo, pwm (comma separated)" value={form.tags} onChange={handleChange} />
+          <label className="block text-sm font-medium mb-1.5">Tags <span className="text-muted-foreground font-normal">(optional, comma separated)</span></label>
+          <Input name="tags" placeholder="arduino, servo, pwm" value={form.tags} onChange={handleChange} />
         </div>
         <Button type="submit" variant="gradient" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
