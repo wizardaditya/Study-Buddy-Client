@@ -12,7 +12,7 @@ const difficultyColor = {
   easy: "success",
   medium: "warning",
   hard: "destructive",
-} as const;
+};
 
 export default function MockTests() {
   const { data: tests = [], isLoading } = useQuery({

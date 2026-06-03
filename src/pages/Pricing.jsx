@@ -6,14 +6,13 @@ import PlanCard from "@/components/pricing/PlanCard";
 import { useAuthStore } from "@/store/auth.store";
 import { subscriptionService } from "@/services/subscription.service";
 import { initiatePayment } from "@/lib/razorpay";
-import type { Plan } from "@/constants/plans";
 
 export default function Pricing() {
   const { user, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
-  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [loadingPlan, setLoadingPlan] = useState(null);
 
-  const handleSelect = async (plan: Plan) => {
+  const handleSelect = async (plan) => {
     if (!isAuthenticated) {
       navigate(ROUTES.REGISTER);
       return;
@@ -22,15 +21,14 @@ export default function Pricing() {
       navigate(ROUTES.DASHBOARD);
       return;
     }
-
     setLoadingPlan(plan.id);
     try {
       const order = await subscriptionService.createOrder(plan.id);
       await initiatePayment({
         orderId: order.orderId,
         amount: order.amount,
-        name: user!.name,
-        email: user!.email,
+        name: user.name,
+        email: user.email,
         planName: plan.name,
         onSuccess: async (response) => {
           await subscriptionService.verifyPayment({
@@ -52,7 +50,6 @@ export default function Pricing() {
   return (
     <div className="py-20 px-4">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-black mb-4">
             Simple, honest <span className="gradient-text">pricing</span>
@@ -61,8 +58,6 @@ export default function Pricing() {
             Start free, upgrade when you're ready. No hidden fees. Cancel anytime.
           </p>
         </div>
-
-        {/* Plans */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
           {PLANS.map((plan) => (
             <PlanCard
@@ -74,8 +69,6 @@ export default function Pricing() {
             />
           ))}
         </div>
-
-        {/* FAQ */}
         <div className="mt-20 text-center">
           <h2 className="text-2xl font-bold mb-2">Have questions?</h2>
           <p className="text-muted-foreground mb-4">

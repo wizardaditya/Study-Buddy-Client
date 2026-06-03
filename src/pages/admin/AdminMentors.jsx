@@ -13,7 +13,7 @@ export default function AdminMentors() {
     queryFn: async () => { const { data } = await api.get("/admin/mentors/pending"); return data.data; },
   });
 
-  const verify = async (id: string) => {
+  const verify = async (id) => {
     await api.put(`/admin/mentors/${id}/verify`);
     queryClient.invalidateQueries({ queryKey: ["admin-mentors-pending"] });
   };
@@ -28,7 +28,7 @@ export default function AdminMentors() {
       {pending.length === 0 && <p className="text-center py-12 text-muted-foreground">No pending applications.</p>}
 
       <div className="space-y-3">
-        {pending.map((mentor: { _id: string; user: { name: string; email: string }; expertise: string[]; hourlyRate: number; bio: string }) => (
+        {pending.map((mentor) => (
           <div key={mentor._id} className="bg-card border border-border rounded-xl p-5">
             <div className="flex items-start justify-between gap-4 flex-wrap">
               <div className="flex items-center gap-3">
@@ -49,7 +49,7 @@ export default function AdminMentors() {
             </div>
             <p className="text-sm text-muted-foreground mt-3 mb-2">{mentor.bio}</p>
             <div className="flex flex-wrap gap-1.5">
-              {mentor.expertise.map((e: string) => <Badge key={e} variant="secondary" className="text-xs">{e}</Badge>)}
+              {mentor.expertise.map((e) => <Badge key={e} variant="secondary" className="text-xs">{e}</Badge>)}
               <Badge variant="blue" className="text-xs">₹{mentor.hourlyRate}/hr</Badge>
             </div>
           </div>

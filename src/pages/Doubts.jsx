@@ -14,7 +14,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 export default function Doubts() {
   const [search, setSearch] = useState("");
   const [selectedTopic, setSelectedTopic] = useState("");
-  const [status, setStatus] = useState<"" | "open" | "answered">("");
+  const [status, setStatus] = useState("");
   const debouncedSearch = useDebounce(search, 400);
 
   const { data, isLoading } = useQuery({
@@ -68,7 +68,7 @@ export default function Doubts() {
         </select>
         <select
           value={status}
-          onChange={(e) => setStatus(e.target.value as "" | "open" | "answered")}
+          onChange={(e) => setStatus(e.target.value)}
           className="h-10 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="">All Status</option>

@@ -1,21 +1,19 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
-import { Video, Users, Plus, Lock } from "lucide-react";
+import { Video, Users, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import api from "@/lib/axios";
 import { ROUTES } from "@/constants";
-import { useAuthStore } from "@/store/auth.store";
-
-interface Room { _id: string; name: string; topic: string; participantsCount: number; maxParticipants: number; isLive: boolean; host: { name: string } }
 
 export default function StudyRooms() {
-  const { user } = useAuthStore();
   const { data: rooms = [], isLoading } = useQuery({
     queryKey: ["rooms"],
-    queryFn: async () => { const { data } = await api.get("/rooms"); return data.data as Room[]; },
+    queryFn: async () => {
+      const { data } = await api.get("/rooms");
+      return data.data;
+    },
   });
 
   return (
@@ -49,7 +47,7 @@ export default function StudyRooms() {
               {room.isLive && <Badge variant="success" className="animate-pulse">● LIVE</Badge>}
             </div>
             <h3 className="font-bold mb-1">{room.name}</h3>
-            <p className="text-xs text-muted-foreground mb-3">Hosted by {room.host.name} · {room.topic}</p>
+            <p className="text-xs text-muted-foreground mb-3">Hosted by {room.host?.name} · {room.topic}</p>
             <div className="flex items-center justify-between">
               <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                 <Users className="h-3.5 w-3.5" /> {room.participantsCount}/{room.maxParticipants}

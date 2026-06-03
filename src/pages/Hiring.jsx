@@ -9,17 +9,6 @@ import { useAuthStore } from "@/store/auth.store";
 import { ROUTES } from "@/constants";
 import { timeAgo } from "@/lib/utils";
 
-interface HiringPost {
-  _id: string;
-  companyName: string;
-  role: string;
-  skills: string[];
-  salary: string;
-  location: string;
-  type: string;
-  postedAt: string;
-}
-
 export default function Hiring() {
   const { user } = useAuthStore();
   const isElite = user?.plan === "elite";
@@ -28,7 +17,7 @@ export default function Hiring() {
     queryKey: ["hiring"],
     queryFn: async () => {
       const { data } = await api.get("/hiring");
-      return data.data as HiringPost[];
+      return data.data;
     },
     enabled: isElite,
   });
@@ -56,7 +45,6 @@ export default function Hiring() {
         <h1 className="text-2xl font-black">Hiring Board</h1>
         <p className="text-sm text-muted-foreground">Companies actively hiring Robotics, IoT & AI talent</p>
       </div>
-
       {isLoading && (
         <div className="space-y-3">
           {Array.from({ length: 5 }).map((_, i) => (
@@ -67,7 +55,6 @@ export default function Hiring() {
           ))}
         </div>
       )}
-
       <div className="space-y-3">
         {jobs.map((job) => (
           <div key={job._id} className="bg-card border border-border rounded-xl p-5 hover:border-primary/30 transition-colors">
@@ -85,9 +72,7 @@ export default function Hiring() {
               </div>
             </div>
             <div className="flex flex-wrap gap-1.5 mt-3">
-              {job.skills.map((skill) => (
-                <Badge key={skill} variant="secondary" className="text-xs">{skill}</Badge>
-              ))}
+              {job.skills.map((skill) => <Badge key={skill} variant="secondary" className="text-xs">{skill}</Badge>)}
               <Badge variant="blue" className="text-xs">{job.type}</Badge>
             </div>
             <Button variant="outline" size="sm" className="mt-4">

@@ -8,10 +8,10 @@ import { mentorService } from "@/services/mentor.service";
 import { getInitials } from "@/lib/utils";
 
 export default function MentorProfile() {
-  const { username } = useParams<{ username: string }>();
+  const { username } = useParams();
   const { data: mentor, isLoading } = useQuery({
     queryKey: ["mentor", username],
-    queryFn: () => mentorService.getMentor(username!),
+    queryFn: () => mentorService.getMentor(username),
     enabled: !!username,
   });
 

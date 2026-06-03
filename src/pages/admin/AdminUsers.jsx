@@ -16,7 +16,7 @@ export default function AdminUsers() {
     queryFn: async () => { const { data } = await api.get("/admin/users"); return data.data; },
   });
 
-  const filtered = search ? users.filter((u: { name: string; email: string }) => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())) : users;
+  const filtered = search ? users.filter((u) => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())) : users;
 
   return (
     <div className="space-y-5">
@@ -47,7 +47,7 @@ export default function AdminUsers() {
                 <td className="p-4"><Skeleton className="h-4 w-20" /></td>
                 <td className="p-4"></td>
               </tr>
-            )) : filtered.map((user: { _id: string; name: string; email: string; plan: string; createdAt: string; isVerified: boolean }) => (
+            )) : filtered.map((user) => (
               <tr key={user._id} className="border-b border-border hover:bg-muted/20">
                 <td className="p-4">
                   <div className="flex items-center gap-3">

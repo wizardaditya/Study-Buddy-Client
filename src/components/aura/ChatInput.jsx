@@ -1,28 +1,20 @@
 import { useState, useRef } from "react";
-import { Send, Mic } from "lucide-react";
+import { Send } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface ChatInputProps {
-  onSend: (message: string) => void;
-  disabled?: boolean;
-  placeholder?: string;
-}
-
-export default function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
+export default function ChatInput({ onSend, disabled, placeholder }) {
   const [value, setValue] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const textareaRef = useRef(null);
 
   const handleSend = () => {
     const trimmed = value.trim();
     if (!trimmed || disabled) return;
     onSend(trimmed);
     setValue("");
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-    }
+    if (textareaRef.current) textareaRef.current.style.height = "auto";
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -45,7 +37,7 @@ export default function ChatInput({ onSend, disabled, placeholder }: ChatInputPr
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           onInput={handleInput}
-          placeholder={placeholder ?? "Ask Aura anything about Robotics, IoT or AI..."}
+          placeholder={placeholder || "Ask Aura anything about Robotics, IoT or AI..."}
           disabled={disabled}
           rows={1}
           className={cn(

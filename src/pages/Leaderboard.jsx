@@ -1,34 +1,25 @@
 import { useQuery } from "@tanstack/react-query";
-import { Trophy, Zap, Flame, Medal } from "lucide-react";
+import { Zap, Flame } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import api from "@/lib/axios";
 import { getInitials } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth.store";
-
-interface LeaderboardUser {
-  rank: number;
-  user: { _id: string; name: string; username: string; avatar?: string };
-  xp: number;
-  streak: number;
-  level: number;
-}
-
-const fetchLeaderboard = async (type: string) => {
-  const { data } = await api.get(`/users/leaderboard?type=${type}`);
-  return data.data as LeaderboardUser[];
-};
+import { cn } from "@/lib/utils";
 
 const rankColors = ["text-yellow-400", "text-slate-300", "text-orange-400"];
 const rankIcons = ["🥇", "🥈", "🥉"];
 
 export default function Leaderboard() {
   const { user } = useAuthStore();
+
   const { data: xpBoard = [], isLoading } = useQuery({
     queryKey: ["leaderboard", "xp"],
-    queryFn: () => fetchLeaderboard("xp"),
+    queryFn: async () => {
+      const { data } = await api.get("/users/leaderboard?type=xp");
+      return data.data;
+    },
   });
 
   return (
@@ -45,14 +36,7 @@ export default function Leaderboard() {
             if (!entry) return null;
             const podiumIndex = i === 1 ? 0 : i === 0 ? 1 : 2;
             return (
-              <div
-                key={entry.user._id}
-                className={`flex flex-col items-center p-4 rounded-2xl border ${
-                  podiumIndex === 0
-                    ? "border-yellow-500/30 bg-yellow-500/5 scale-105"
-                    : "border-border bg-card"
-                }`}
-              >
+              <div key={entry.user._id} className={`flex flex-col items-center p-4 rounded-2xl border ${podiumIndex === 0 ? "border-yellow-500/30 bg-yellow-500/5 scale-105" : "border-border bg-card"}`}>
                 <span className="text-2xl mb-2">{rankIcons[podiumIndex]}</span>
                 <Avatar className="h-12 w-12 mb-2">
                   <AvatarImage src={entry.user.avatar} />
@@ -71,7 +55,6 @@ export default function Leaderboard() {
           <TabsTrigger value="xp"><Zap className="h-3.5 w-3.5 mr-1.5" />XP</TabsTrigger>
           <TabsTrigger value="streak"><Flame className="h-3.5 w-3.5 mr-1.5" />Streak</TabsTrigger>
         </TabsList>
-
         <TabsContent value="xp">
           <div className="bg-card border border-border rounded-xl overflow-hidden">
             {isLoading
@@ -86,11 +69,9 @@ export default function Leaderboard() {
               : xpBoard.map((entry, i) => (
                   <div
                     key={entry.user._id}
-                    className={`flex items-center gap-4 p-4 border-b border-border last:border-0 hover:bg-accent/30 transition-colors ${
-                      entry.user._id === user?._id ? "bg-primary/5 border-primary/20" : ""
-                    }`}
+                    className={`flex items-center gap-4 p-4 border-b border-border last:border-0 hover:bg-accent/30 transition-colors ${entry.user._id === user?._id ? "bg-primary/5" : ""}`}
                   >
-                    <span className={`w-7 text-center font-black text-sm ${rankColors[i] ?? "text-muted-foreground"}`}>
+                    <span className={cn("w-7 text-center font-black text-sm", rankColors[i] || "text-muted-foreground")}>
                       {i < 3 ? rankIcons[i] : `#${i + 1}`}
                     </span>
                     <Avatar className="h-9 w-9">
@@ -102,18 +83,14 @@ export default function Leaderboard() {
                       <p className="text-xs text-muted-foreground">@{entry.user.username} · Level {entry.level}</p>
                     </div>
                     <div className="flex items-center gap-1.5 text-purple-400 font-bold text-sm">
-                      <Zap className="h-3.5 w-3.5" />
-                      {entry.xp}
+                      <Zap className="h-3.5 w-3.5" />{entry.xp}
                     </div>
                   </div>
                 ))}
           </div>
         </TabsContent>
-
         <TabsContent value="streak">
-          <div className="text-center py-10 text-muted-foreground">
-            Streak leaderboard coming soon...
-          </div>
+          <div className="text-center py-10 text-muted-foreground">Streak leaderboard coming soon...</div>
         </TabsContent>
       </Tabs>
     </div>

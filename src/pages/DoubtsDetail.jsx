@@ -11,7 +11,7 @@ import { useAuthStore } from "@/store/auth.store";
 import { timeAgo, getInitials } from "@/lib/utils";
 
 export default function DoubtsDetail() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
@@ -20,7 +20,7 @@ export default function DoubtsDetail() {
 
   const { data, isLoading } = useQuery({
     queryKey: ["doubt", id],
-    queryFn: () => doubtService.getDoubt(id!),
+    queryFn: () => doubtService.getDoubt(id),
     enabled: !!id,
   });
 
@@ -38,7 +38,7 @@ export default function DoubtsDetail() {
     }
   };
 
-  const handleAccept = async (answerId: string) => {
+  const handleAccept = async (answerId) => {
     if (!id) return;
     await doubtService.acceptAnswer(id, answerId);
     queryClient.invalidateQueries({ queryKey: ["doubt", id] });
@@ -116,7 +116,7 @@ export default function DoubtsDetail() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => doubtService.upvoteAnswer(id!, answer._id)}
+                    onClick={() => doubtService.upvoteAnswer(id, answer._id)}
                     className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground px-2 py-1 rounded-lg hover:bg-accent"
                   >
                     <ThumbsUp className="h-3.5 w-3.5" /> {answer.upvotes}

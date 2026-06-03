@@ -9,16 +9,16 @@ import { ROUTES } from "@/constants";
 import { cn } from "@/lib/utils";
 
 export default function MockTest() {
-  const { testId } = useParams<{ testId: string }>();
+  const { testId } = useParams();
   const navigate = useNavigate();
   const [current, setCurrent] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState({});
   const [timeLeft, setTimeLeft] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   const { data: test, isLoading } = useQuery({
     queryKey: ["test", testId],
-    queryFn: () => testService.getTest(testId!),
+    queryFn: () => testService.getTest(testId),
     enabled: !!testId,
   });
 
@@ -43,7 +43,11 @@ export default function MockTest() {
     }
   };
 
-  if (isLoading) return <div className="flex justify-center py-20"><div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent" /></div>;
+  if (isLoading) return (
+    <div className="flex justify-center py-20">
+      <div className="animate-spin h-8 w-8 rounded-full border-2 border-primary border-t-transparent" />
+    </div>
+  );
   if (!test) return <div className="text-center py-20 text-muted-foreground">Test not found.</div>;
 
   const question = test.questions[current];
@@ -53,7 +57,6 @@ export default function MockTest() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      {/* Header */}
       <div className="bg-card border border-border rounded-xl p-4 flex items-center justify-between">
         <div>
           <p className="font-bold">{test.title}</p>
@@ -70,11 +73,8 @@ export default function MockTest() {
 
       <Progress value={progress} />
 
-      {/* Question */}
       <div className="bg-card border border-border rounded-xl p-6">
-        <p className="font-semibold text-base mb-6">
-          Q{current + 1}. {question.question}
-        </p>
+        <p className="font-semibold text-base mb-6">Q{current + 1}. {question.question}</p>
         <div className="space-y-2.5">
           {question.options.map((option, i) => {
             const isSelected = answers[question._id] === option;
@@ -97,33 +97,22 @@ export default function MockTest() {
         </div>
       </div>
 
-      {/* Navigation */}
       <div className="flex items-center justify-between">
-        <Button
-          variant="outline"
-          onClick={() => setCurrent((c) => c - 1)}
-          disabled={current === 0}
-        >
+        <Button variant="outline" onClick={() => setCurrent((c) => c - 1)} disabled={current === 0}>
           <ChevronLeft className="h-4 w-4 mr-1" /> Previous
         </Button>
-
         {current < test.questions.length - 1 ? (
           <Button variant="gradient" onClick={() => setCurrent((c) => c + 1)}>
             Next <ChevronRight className="h-4 w-4 ml-1" />
           </Button>
         ) : (
-          <Button
-            variant="gradient"
-            onClick={handleSubmit}
-            disabled={submitting}
-          >
+          <Button variant="gradient" onClick={handleSubmit} disabled={submitting}>
             {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Send className="h-4 w-4 mr-1.5" /> Submit Test
           </Button>
         )}
       </div>
 
-      {/* Answer dots */}
       <div className="flex flex-wrap gap-1.5 justify-center">
         {test.questions.map((q, i) => (
           <button

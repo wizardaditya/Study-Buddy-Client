@@ -13,10 +13,10 @@ export default function DoubtsNew() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+  const handleChange = (e) =>
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     if (!form.topic) { setError("Please select a topic"); return; }
@@ -46,76 +46,36 @@ export default function DoubtsNew() {
 
       <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-5">
         {error && (
-          <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3">
-            {error}
-          </div>
+          <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3">{error}</div>
         )}
-
         <div>
           <label className="block text-sm font-medium mb-1.5">Title *</label>
-          <Input
-            name="title"
-            placeholder="e.g. How to configure PWM on ESP32 for servo control?"
-            value={form.title}
-            onChange={handleChange}
-            required
-            maxLength={200}
-          />
+          <Input name="title" placeholder="e.g. How to configure PWM on ESP32 for servo control?" value={form.title} onChange={handleChange} required maxLength={200} />
           <p className="text-xs text-muted-foreground mt-1">{form.title.length}/200</p>
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1.5">Explain your doubt *</label>
-          <textarea
-            name="content"
-            placeholder="Describe what you tried, what you expected, and what happened. Include any code, error messages, or circuit details."
-            value={form.content}
-            onChange={handleChange}
-            required
-            rows={8}
-            className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none"
-          />
+          <textarea name="content" placeholder="Describe what you tried, what you expected, and what happened..." value={form.content} onChange={handleChange} required rows={8} className="w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground resize-none" />
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1.5">Topic *</label>
-          <select
-            name="topic"
-            value={form.topic}
-            onChange={handleChange}
-            required
-            className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          >
+          <select name="topic" value={form.topic} onChange={handleChange} required className="w-full h-10 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring">
             <option value="">Select a topic</option>
             <optgroup label="🤖 Robotics">
-              {TOPICS.filter((t) => t.category === "robotics").map((t) => (
-                <option key={t.id} value={t.slug}>{t.name}</option>
-              ))}
+              {TOPICS.filter((t) => t.category === "robotics").map((t) => <option key={t.id} value={t.slug}>{t.name}</option>)}
             </optgroup>
             <optgroup label="📡 IoT">
-              {TOPICS.filter((t) => t.category === "iot").map((t) => (
-                <option key={t.id} value={t.slug}>{t.name}</option>
-              ))}
+              {TOPICS.filter((t) => t.category === "iot").map((t) => <option key={t.id} value={t.slug}>{t.name}</option>)}
             </optgroup>
             <optgroup label="🧠 AI">
-              {TOPICS.filter((t) => t.category === "ai").map((t) => (
-                <option key={t.id} value={t.slug}>{t.name}</option>
-              ))}
+              {TOPICS.filter((t) => t.category === "ai").map((t) => <option key={t.id} value={t.slug}>{t.name}</option>)}
             </optgroup>
           </select>
         </div>
-
         <div>
           <label className="block text-sm font-medium mb-1.5">Tags</label>
-          <Input
-            name="tags"
-            placeholder="arduino, servo, pwm (comma separated)"
-            value={form.tags}
-            onChange={handleChange}
-          />
-          <p className="text-xs text-muted-foreground mt-1">Optional — helps others find your doubt</p>
+          <Input name="tags" placeholder="arduino, servo, pwm (comma separated)" value={form.tags} onChange={handleChange} />
         </div>
-
         <Button type="submit" variant="gradient" className="w-full" disabled={loading}>
           {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Post Doubt (+15 XP)

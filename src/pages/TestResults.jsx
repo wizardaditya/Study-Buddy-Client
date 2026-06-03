@@ -7,10 +7,10 @@ import { testService } from "@/services/test.service";
 import { ROUTES } from "@/constants";
 
 export default function TestResults() {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const { data: result, isLoading } = useQuery({
     queryKey: ["test-result", id],
-    queryFn: () => testService.getResult(id!),
+    queryFn: () => testService.getResult(id),
     enabled: !!id,
   });
 

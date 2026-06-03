@@ -13,22 +13,17 @@ export default function Register() {
   const [error, setError] = useState("");
   const { register } = useAuth();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    if (form.password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
+    if (form.password.length < 8) { setError("Password must be at least 8 characters"); return; }
     setLoading(true);
     try {
       await register(form);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Registration failed. Try again.";
-      setError(msg);
+    } catch (err) {
+      setError(err?.response?.data?.message || "Registration failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -44,77 +39,43 @@ export default function Register() {
           <h1 className="text-2xl font-black">Join Study Buddy</h1>
           <p className="text-muted-foreground mt-1">Free forever · No credit card needed</p>
         </div>
-
         <div className="bg-card border border-border rounded-2xl p-8">
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3 mb-6">
-              {error}
-            </div>
-          )}
-
+          {error && <div className="bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg p-3 mb-6">{error}</div>}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1.5">Full Name</label>
               <Input name="name" placeholder="Arjun Sharma" value={form.name} onChange={handleChange} required />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1.5">Username</label>
-              <Input
-                name="username"
-                placeholder="arjun_sharma"
-                value={form.username}
-                onChange={handleChange}
-                required
-                pattern="[a-z0-9_]+"
-                title="Lowercase letters, numbers, and underscores only"
-              />
+              <Input name="username" placeholder="arjun_sharma" value={form.username} onChange={handleChange} required pattern="[a-z0-9_]+" title="Lowercase letters, numbers, and underscores only" />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1.5">Email</label>
               <Input name="email" type="email" placeholder="you@example.com" value={form.email} onChange={handleChange} required />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1.5">Password</label>
               <div className="relative">
-                <Input
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Min 8 characters"
-                  value={form.password}
-                  onChange={handleChange}
-                  required
-                  minLength={8}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
+                <Input name="password" type={showPassword ? "text" : "password"} placeholder="Min 8 characters" value={form.password} onChange={handleChange} required minLength={8} />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
             </div>
-
             <Button type="submit" variant="gradient" className="w-full mt-2" disabled={loading}>
               {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Create Account
             </Button>
           </form>
-
           <p className="text-center text-xs text-muted-foreground mt-4">
             By signing up, you agree to our{" "}
             <a href="#" className="text-primary hover:underline">Terms</a> and{" "}
             <a href="#" className="text-primary hover:underline">Privacy Policy</a>
           </p>
-
           <p className="text-center text-sm text-muted-foreground mt-4">
             Already have an account?{" "}
-            <Link to={ROUTES.LOGIN} className="text-primary hover:underline font-medium">
-              Sign in
-            </Link>
+            <Link to={ROUTES.LOGIN} className="text-primary hover:underline font-medium">Sign in</Link>
           </p>
         </div>
       </div>

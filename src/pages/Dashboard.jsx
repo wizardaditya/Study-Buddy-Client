@@ -58,7 +58,7 @@ export default function Dashboard() {
             </div>
 
             <div className="flex items-center gap-3">
-              {me?.currentStreak! > 0 && (
+              {me?.currentStreak > 0 && (
                 <div className="flex items-center gap-1.5 bg-orange-500/10 border border-orange-500/20 rounded-full px-3 py-1.5">
                   <Flame className="h-4 w-4 text-orange-400" />
                   <span className="text-sm font-bold text-orange-400">{me?.currentStreak} days</span>

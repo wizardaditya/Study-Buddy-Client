@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
-import { Bot, Loader2 } from "lucide-react";
+import { Bot } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import { useAuraStore } from "@/store/aura.store";
 
 export default function ChatWindow() {
   const { messages, isTyping } = useAuraStore();
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });

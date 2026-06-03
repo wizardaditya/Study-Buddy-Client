@@ -11,12 +11,12 @@ import { useAuthStore } from "@/store/auth.store";
 import { getInitials } from "@/lib/utils";
 
 export default function Profile() {
-  const { username } = useParams<{ username: string }>();
+  const { username } = useParams();
   const { user: me } = useAuthStore();
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", username],
-    queryFn: () => userService.getProfile(username!),
+    queryFn: () => userService.getProfile(username),
     enabled: !!username,
   });
 
