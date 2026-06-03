@@ -5,8 +5,16 @@ export const authService = {
     const { data } = await api.post("/auth/login", { email, password });
     return data.data;
   },
-  async register({ name, username, email, password }) {
-    const { data } = await api.post("/auth/register", { name, username, email, password });
+  async register({ name, username, email, password, role, expertise }) {
+    const { data } = await api.post("/auth/register", { name, username, email, password, role, expertise });
+    return data.data;
+  },
+  async googleAuth(idToken) {
+    const { data } = await api.post("/auth/google", { idToken });
+    return data.data; // { user, accessToken, refreshToken, isNewUser }
+  },
+  async completeOnboarding(role, expertise) {
+    const { data } = await api.post("/auth/onboarding", { role, expertise });
     return data.data;
   },
   async forgotPassword(email) {
@@ -21,9 +29,5 @@ export const authService = {
   },
   async logout() {
     await api.post("/auth/logout");
-  },
-  async googleAuth(idToken) {
-    const { data } = await api.post("/auth/google", { idToken });
-    return data.data;
   },
 };

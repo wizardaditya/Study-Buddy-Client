@@ -13,6 +13,14 @@ export const userService = {
     const { data } = await api.get(`/users/${username}`);
     return data.data;
   },
+  async getUsers({ role, search, page = 1 } = {}) {
+    const params = new URLSearchParams();
+    if (role) params.set("role", role);
+    if (search) params.set("search", search);
+    params.set("page", page);
+    const { data } = await api.get(`/users?${params}`);
+    return data.data;
+  },
   async follow(userId) {
     await api.post(`/users/${userId}/follow`);
   },

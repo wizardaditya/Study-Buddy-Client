@@ -8,6 +8,7 @@ export const useAuthStore = create(
       token: null,
       refreshToken: null,
       isAuthenticated: false,
+      needsOnboarding: false,
 
       setAuth: (user, token, refreshToken) =>
         set({ user, token, refreshToken, isAuthenticated: true }),
@@ -20,7 +21,7 @@ export const useAuthStore = create(
         })),
 
       logout: () =>
-        set({ user: null, token: null, refreshToken: null, isAuthenticated: false }),
+        set({ user: null, token: null, refreshToken: null, isAuthenticated: false, needsOnboarding: false }),
     }),
     { name: "study-buddy-auth" }
   )

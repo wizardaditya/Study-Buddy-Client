@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth.store";
+import OnboardingModal from "@/components/shared/OnboardingModal";
+import { useAuth } from "@/hooks/useAuth";
 
 // Layouts
 import PublicLayout from "@/layouts/PublicLayout";
@@ -60,8 +62,14 @@ function GuestRoute({ children }) {
 }
 
 export default function App() {
+  const { needsOnboarding } = useAuthStore();
+  const { completeOnboarding } = useAuth();
+
   return (
     <BrowserRouter>
+      {needsOnboarding && (
+        <OnboardingModal onComplete={() => useAuthStore.setState({ needsOnboarding: false })} />
+      )}
       <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
