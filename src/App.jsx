@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthStore } from "@/store/auth.store";
 import OnboardingModal from "@/components/shared/OnboardingModal";
-import { useAuth } from "@/hooks/useAuth";
 
 // Layouts
 import PublicLayout from "@/layouts/PublicLayout";
@@ -61,15 +60,19 @@ function GuestRoute({ children }) {
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
 }
 
-export default function App() {
-  const { needsOnboarding } = useAuthStore();
-  const { completeOnboarding } = useAuth();
+// Inner component — lives inside BrowserRouter so useNavigate works
+function AppInner() {
+  const { needsOnboarding, isAuthenticated } = useAuthStore();
 
   return (
-    <BrowserRouter>
-      {needsOnboarding && (
-        <OnboardingModal onComplete={() => useAuthStore.setState({ needsOnboarding: false })} />
+    <>
+      {/* Onboarding modal for new Google users */}
+      {isAuthenticated && needsOnboarding && (
+        <OnboardingModal
+          onComplete={() => useAuthStore.setState({ needsOnboarding: false })}
+        />
       )}
+
       <Routes>
         {/* Public */}
         <Route element={<PublicLayout />}>
@@ -115,6 +118,14 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppInner />
     </BrowserRouter>
   );
 }
